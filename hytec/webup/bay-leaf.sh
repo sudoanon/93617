@@ -189,7 +189,7 @@ IFS='|' && while read LINE DEPLoy; do
 if wget --spider -S "$LINE" 2>&1 | grep -w "200\|301" ; then
   echo "DEBUG WGET says $LINE is up" >> $LogFile1
 else
-  echo "DEBUG WGET says $LINE is down" >> $Logfile1
+  echo "DEBUG WGET says $LINE is down" >> $LogFile1
   curl -Is $LINE | head -n 1 >> $LogFile1
 fi
 
