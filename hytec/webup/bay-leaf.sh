@@ -22,7 +22,7 @@ ScanTIME=$(date +%Y-%m-%d:%H:%M)
 DayGreet=$(date +%H)
 
 if [ "$DayGreet" -lt 12 ]; then                                                                 # Time sensitve greetings if needed
-  Greet="Good morning!"                                                         			        # They are often not, but hay ho
+  Greet="Good morning!"                                                         			          # They are often not, but hay ho
 elif [ "$DayGreet" -lt 18 ]; then
   Greet="Good afternoon!"
 else
