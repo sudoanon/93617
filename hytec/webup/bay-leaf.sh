@@ -78,7 +78,7 @@ get_message_body() {
       This appears to be fixed, however, check back in on the USM deployment over the next few hours even if no more of these website down messages are received."
     ;;
   esac
-  printf "$message_body"
+  echo "$message_body"
 }
 
 # print message heredoc
@@ -118,9 +118,7 @@ IFS='|' && while read -r domain DEPLoy; do
 
   OUTputFileName="$ActiveFolder/webup/$domain_x.DEAD"						# Set file name if site is down
 #  LogFile1="$ActiveFolder/logs/$domain_x-logfile-$(date +'%Y-%m').csv"				# Set the logfile name for checks
-#  LogFile2="$ActiveFolder/logs/$domain_x-WEB-DOWN-$(date +'%Y-%m').txt"
   LogFile1="$ActiveFolder/logs/$domain_x-logfile-$(date +'%Y-%m').csv"				# Set the logfile name for checks
-  LogFile2="$ActiveFolder/logs/$domain_x-WEB-DOWN-$(date +'%Y-%m').txt"
 
   domain_x="${domain_x%.*}"										# If this is needed it shortens the domain name 10/25th
 
@@ -190,8 +188,8 @@ IFS='|' && while read -r domain DEPLoy; do
       write_logfile "${GetDEADfile}"                      # Write to dead logfile
       curl -Is "$domain" | head -n 1 >> "$LogFile1"								# Debug code.....
       AlertSub="$domain part of the $DEPLoy USM deployment is reporting as DOWN"
-      #mutt -s "Hytec Labs: (${$AlertSub})" -- "test@test.com" < <(print_message)
-      mutt -s "Hytec Labs: (${$AlertSub})" -- "test@test.com" < <(print_message)
+      #mutt -s "Hytec Labs: (${AlertSub})" -- "test@test.com" < <(print_message)
+      mutt -s "Hytec Labs: (${AlertSub})" -- "test@test.com" < <(print_message)
     fi
   fi
 
