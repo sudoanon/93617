@@ -88,7 +88,7 @@ IFS='|' && while read -r domain DEPLoy; do
     if [ -f "$OUTputFileName" ]; then								# Check if the site is off line
       AlertSub="back up!"
       message_body="$domain_x Reports as back up.
-      This appears to be fixed, however, check back in on the USM deployment over the next few hours even if no more of these website down messages are received."
+                    This appears to be fixed, however, check back in on the USM deployment over the next few hours even if no more of these website down messages are received."
       mutt -s "Hytec Labs: ${domain_x} is (${AlertSub})" -- "test@test.com" < <(print_message)
       rm -f "$OUTputFileName"
     fi
@@ -106,8 +106,8 @@ IFS='|' && while read -r domain DEPLoy; do
             write_logfile "${GetDEADfile}"						   	# Write to dead logfile
             AlertSub="20 mins now"
             message_body="$domain_x is confirmed as down/offline at this time.
-            This looks more than a glitch and is an IOA (Indicator of Activity)/possibly IOC, please fully check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
-            Strongly consider an investigation and/or escalation of this issue (suggest HIGH) with the client, they may or maybe not be aware their web site is off line..."
+                          This looks more than a glitch and is an IOA (Indicator of Activity)/possibly IOC, please fully check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
+                          Strongly consider an investigation and/or escalation of this issue (suggest HIGH) with the client, they may or maybe not be aware their web site is off line..."
             #mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             ;;
@@ -115,8 +115,8 @@ IFS='|' && while read -r domain DEPLoy; do
             write_logfile "${GetDEADfile}"						   	# Write to dead logfile
             AlertSub="4 Hrs now"
             message_body="$domain_x Reports as still down at this time.
-            Its been down for four hours now, fully check the $DEPLoy USM deployment again as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
-            Consider chasing this for an update from the client (at least via email), if we have not heard anything on this matter."            
+                          Its been down for four hours now, fully check the $DEPLoy USM deployment again as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
+                          Consider chasing this for an update from the client (at least via email), if we have not heard anything on this matter."            
             #mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             ;;
@@ -124,8 +124,8 @@ IFS='|' && while read -r domain DEPLoy; do
             write_logfile "${GetDEADfile}"						   	# Write to dead logfile
             AlertSub="12 Hrs now"
             message_body="$domain_x Remains down at this time.
-            Please fully check the $DEPLoy USM deployment again, for signs of IOA/IOC, also update #mssaware with your findings.
-            Consider chasing this for an update from the client if we have not heard anything on this matter."
+                          Please fully check the $DEPLoy USM deployment again, for signs of IOA/IOC, also update #mssaware with your findings.
+                          Consider chasing this for an update from the client if we have not heard anything on this matter."
             #mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             ;;
@@ -133,8 +133,8 @@ IFS='|' && while read -r domain DEPLoy; do
             write_logfile "${GetDEADfile}"						   	# Write to dead logfile
             AlertSub="1 day now"
             message_body="$domain_x Remains down at this time.
-            Its been down for twenty four hours now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with your findings.
-            Consider chasing this for an update from the client if we have not heard anything on this matter."
+                          Its been down for twenty four hours now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with your findings.
+                          Consider chasing this for an update from the client if we have not heard anything on this matter."
             #mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             ;;
@@ -142,7 +142,7 @@ IFS='|' && while read -r domain DEPLoy; do
             write_logfile "${GetDEADfile}"						   	# Write to dead logfile
             AlertSub="2 days now"
             message_body="$domain_x Still reports as down at this time.
-            Please keep checking the $DEPLoy USM deployment IOCs, also update #mssaware with your findings."
+                          Please keep checking the $DEPLoy USM deployment IOCs, also update #mssaware with your findings."
             #mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             ;;
@@ -150,9 +150,9 @@ IFS='|' && while read -r domain DEPLoy; do
             write_logfile "${GetDEADfile}"						   	# Write to dead logfile
             AlertSub="3 days now"
             message_body="$domain_x Still reports as down at this time.
-            Its been down a while now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with any observations.
+                          Its been down a while now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with any observations.
 
-            NOTE: There will be no further HyBox Bay-Leaf messages on this matter, until the confirmation that the site is back up."
+                          NOTE: There will be no further HyBox Bay-Leaf messages on this matter, until the confirmation that the site is back up."
             #mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             mutt -s "Hytec Labs: ${domain_x} is down (${AlertSub})" -- "test@test.com" < <(print_message)
             ;;
@@ -163,8 +163,8 @@ IFS='|' && while read -r domain DEPLoy; do
       curl -Is "$domain" | head -n 1 >> "$LogFile1"								# Debug code.....
       AlertSub="$domain_x part of the $DEPLoy USM deployment is reporting as DOWN"
       message_body="$domain_x Reports as down at this time.
-      This alarm is an IOA (Indicator of Activity)/possibly an IOC, please do a quick check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware / #msswatch with your findings.
-      To note: sometimes a web site can report off line, and be fine (ie just busy), please await the next check in 20 mins, for confirmation prior to any escalation of this issue."
+                    This alarm is an IOA (Indicator of Activity)/possibly an IOC, please do a quick check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware / #msswatch with your findings.
+                    To note: sometimes a web site can report off line, and be fine (ie just busy), please await the next check in 20 mins, for confirmation prior to any escalation of this issue."
       #mutt -s "Hytec Labs: (${AlertSub})" -- "test@test.com" < <(print_message)
       mutt -s "Hytec Labs: (${AlertSub})" -- "test@test.com" < <(print_message)
     fi
