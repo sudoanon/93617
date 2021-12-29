@@ -34,12 +34,10 @@ get_greeting() {
   printf -- 'Good %s!\n' "${greet_moment}"
 }
 
-
 # message body case statement
-
 get_message_body() {
 
-  case "${1}" in
+  case "${GetDEADfile}" in
     (2)
       message_body="$LINE is confirmed as down/offline at this time.
       This looks more than a glitch and is an IOA (Indicator of Activity)/possibly IOC, please fully check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
@@ -82,7 +80,7 @@ get_message_body() {
 print_message() {
 cat << EOF
 $(get_greeting)
-$(get_message_body "${GetDEADfile}")
+$(get_message_body)
 
 Regards
 
