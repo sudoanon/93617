@@ -3,42 +3,42 @@ get_message_body() {
 
   case "${GetDEADfile}" in
     (2)
-      message_body="$domain is confirmed as down/offline at this time.
+      message_body="$domain_x is confirmed as down/offline at this time.
       This looks more than a glitch and is an IOA (Indicator of Activity)/possibly IOC, please fully check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
       Strongly consider an investigation and/or escalation of this issue (suggest HIGH) with the client, they may or maybe not be aware their web site is off line..."
     ;;
     (13)
-      message_body="$domain Reports as still down at this time.
+      message_body="$domain_x Reports as still down at this time.
         Its been down for four hours now, fully check the $DEPLoy USM deployment again as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
         Consider chasing this for an update from the client (at least via email), if we have not heard anything on this matter."
     ;;
     (37)
-      message_body="$domain Remains down at this time.
+      message_body="$domain_x Remains down at this time.
         Please fully check the $DEPLoy USM deployment again, for signs of IOA/IOC, also update #mssaware with your findings.
         Consider chasing this for an update from the client if we have not heard anything on this matter."
     ;;
     (73)
-      message_body="$domain Remains down at this time.
+      message_body="$domain_x Remains down at this time.
         Its been down for twenty four hours now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with your findings.
         Consider chasing this for an update from the client if we have not heard anything on this matter."
     ;;
     (145)
-      message_body="$domain Still reports as down at this time.
+      message_body="$domain_x Still reports as down at this time.
       Please keep checking the $DEPLoy USM deployment IOCs, also update #mssaware with your findings."
     ;;
     (217)
-      message_body="$domain Still reports as down at this time.
+      message_body="$domain_x Still reports as down at this time.
       Its been down a while now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with any observations.
 
       NOTE: There will be no further HyBox Bay-Leaf messages on this matter, until the confirmation that the site is back up."
     ;;
     (1)
-      message_body="$domain Reports as down at this time.
+      message_body="$domain_x Reports as down at this time.
       This alarm is an IOA (Indicator of Activity)/possibly an IOC, please do a quick check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware / #msswatch with your findings.
       To note: sometimes a web site can report off line, and be fine (ie just busy), please await the next check in 20 mins, for confirmation prior to any escalation of this issue."
     ;;
     (*)
-      message_body="$domain Reports as back up.
+      message_body="$domain_x Reports as back up.
       This appears to be fixed, however, check back in on the USM deployment over the next few hours even if no more of these website down messages are received."
     ;;
   esac
