@@ -21,14 +21,86 @@ ActiveFolder="/opt/hytec"									# Live
 ScanTIME=$(date +%Y-%m-%d:%H:%M)
 DayGreet=$(date +%H)
 
-if [ "$DayGreet" -lt 12 ]; then                                                                 # Time sensitve greetings if needed
-  Greet="Good morning!"                                                         			          # They are often not, but hay ho
-elif [ "$DayGreet" -lt 18 ]; then
-  Greet="Good afternoon!"
-else
-  Greet="Good evening!"
-fi
+# salutations function
+get_greeting() {
+  local greet_moment
+  if (( "${DayGreet:-$(date +%H)}" >= 18 )); then
+    greet_moment="evening"
+  elif (( "${DayGreet:-$(date +%H)}" >= 12 )); then
+    greet_moment="afternoon"
+  else
+    greet_moment="morning"
+  fi
+  printf -- 'Good %s!\n' "${greet_moment}"
+}
 
+
+# message body case statement
+
+get_message_body() {
+
+  case "${1}" in
+    (2)
+      message_body="$LINE is confirmed as down/offline at this time.
+      This looks more than a glitch and is an IOA (Indicator of Activity)/possibly IOC, please fully check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
+      Strongly consider an investigation and/or escalation of this issue (suggest HIGH) with the client, they may or maybe not be aware their web site is off line..."
+    ;;
+    (13)
+      message_body="$LINE Reports as still down at this time.
+        Its been down for four hours now, fully check the $DEPLoy USM deployment again as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.
+        Consider chasing this for an update from the client (at least via email), if we have not heard anything on this matter."
+    ;;
+    (37)
+      message_body="$LINE Remains down at this time.
+        Please fully check the $DEPLoy USM deployment again, for signs of IOA/IOC, also update #mssaware with your findings.
+        Consider chasing this for an update from the client if we have not heard anything on this matter."
+    ;;
+    (73)
+      message_body="$LINE Remains down at this time.
+        Its been down for twenty four hours now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with your findings.
+        Consider chasing this for an update from the client if we have not heard anything on this matter."
+    ;;
+    (145)
+      message_body="$LINE Still reports as down at this time.
+      Please keep checking the $DEPLoy USM deployment IOCs, also update #mssaware with your findings."
+    ;;
+    (217)
+      message_body="$LINE Still reports as down at this time.
+      Its been down a while now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with any observations.
+
+      NOTE: There will be no further HyBox Bay-Leaf messages on this matter, until the confirmation that the site is back up."
+    ;;
+    (1)
+      message_body="$LINE Reports as down at this time.
+      This alarm is an IOA (Indicator of Activity)/possibly an IOC, please do a quick check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware / #msswatch with your findings.
+      To note: sometimes a web site can report off line, and be fine (ie just busy), please await the next check in 20 mins, for confirmation prior to any escalation of this issue."
+  esac
+  printf "$message_body"
+}
+
+# print message heredoc
+print_message() {
+cat << EOF
+$(get_greeting)
+$(get_message_body "${GetDEADfile}")
+
+Regards
+
+
+Bay-Leaf
+(in beta)
+
+
+Software Version: $SetVersion
+
+
+EOF
+}
+
+# Write logfile function
+write_logfile() {
+  printf -- 'W,%s,,Website down,%s\n' "${ScanTIME}" "${1}" >> "${LogFile1}"
+}
 
 IFS='|' && while read -r LINE DEPLoy; do
 
@@ -52,7 +124,6 @@ IFS='|' && while read -r LINE DEPLoy; do
 
   STARTTime=$(date +%s.%3N)									# Start check time counter
 
-
   if curl --connect-timeout 7.00 --max-time 10 --retry 6 -I "$LINE" 2>&1| grep -w "200\|301" ; then
   # The above based on https://stackoverflow.com/questions/42873285/curl-retry-mechanism
 
@@ -63,7 +134,7 @@ IFS='|' && while read -r LINE DEPLoy; do
     if [ -f "$OUTputFileName" ]; then								# Check if the site is off line
       AlertSub="Hytec Labs: $LINE is back up!"
       printf 
-      "$Greet\n
+      "$(get_greeting)
       $LINE Reports as back up.\n
       This appears to be fixed, however, check back in on the USM deployment over the next few hours even if no more of these website down messages are received.\n\n
       Regards\n\n\n
@@ -84,112 +155,52 @@ IFS='|' && while read -r LINE DEPLoy; do
       GetDEADfile=$( cat "$OUTputFileName" )								# Read an open .dead file
       ((GetDEADfile=GetDEADfile + 1))
       echo $GetDEADfile > "$OUTputFileName"
-      if [ $GetDEADfile -eq 2 ]; then		#send email
-        echo "W,$ScanTIME,,Website down,2" >> "$LogFile1"							# Write to dead logfile
-        AlertSub="Hytec Labs: $LINE has been down for 20 mins now"
-        printf 
-        "$Greet\n
-        $LINE is confirmed as down/offline at this time.\n
-        This looks more than a glitch and is an IOA (Indicator of Activity)/possibly IOC, please fully check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.\n
-        Strongly consider an investigation and/or escalation of this issue (suggest HIGH) with the client, they may or maybe not be aware their web site is off line...\n\n
-        Regards\n\n\n
-        Bay-Leaf\n
-        (in beta)\n\n\n
-        Software Version: $SetVersion\n\n\n" >> "$SiteReport1"
-        #mutt -s "$AlertSub" -- "test@test.com" < $SiteReport1
-        mutt -s "$AlertSub" -- "test@test.com" <"$SiteReport1"
-      elif [ $GetDEADfile -eq 13 ];then		#send email
-        echo "W,$ScanTIME,,Website down,13" >> "$LogFile1"							# Write to dead logfile
-        AlertSub="Hytec Labs: $LINE is down (4 Hrs now)"
-        printf 
-        "$Greet\n        
-        $LINE Reports as still down at this time.\n
-        Its been down for four hours now, fully check the $DEPLoy USM deployment again as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware with your findings.\n
-        Consider chasing this for an update from the client (at least via email), if we have not heard anything on this matter.\n\n
-        Regards\n\n\n
-        Bay-Leaf\n
-        (in beta)\n\n\n
-        Software Version: $SetVersion\n\n\n" >> "$SiteReport1"
-        #mutt -s "$AlertSub" -- "test@test.com" < $SiteReport1
-        mutt -s "$AlertSub" -- "test@test.com" <"$SiteReport1"
-      elif [ $GetDEADfile -eq 37 ];then		#send email
-        echo "W,$ScanTIME,,Website down,37" >> "$LogFile1"							# Write to dead logfile
-        AlertSub="Hytec Labs: $LINE is down (12 Hrs now)"
-        printf
-        "$Greet\n
-        $LINE Remains down at this time.\n
-        Please fully check the $DEPLoy USM deployment again, for signs of IOA/IOC, also update #mssaware with your findings.\n
-        Consider chasing this for an update from the client if we have not heard anything on this matter.\n\n
-        Regards\n\n\n
-        Bay-Leaf\n
-        (in beta)\n\n\n
-        Software Version: $SetVersion\n\n\n" >> "$SiteReport1"
-        #mutt -s "$AlertSub" -- "test@test.com" < $SiteReport1
-        mutt -s "$AlertSub" -- "test@test.com" <"$SiteReport1"
-      elif [ $GetDEADfile -eq 73 ];then		#send email
-        echo "W,$ScanTIME,,Website down,73" >> "$LogFile1"							# Write to dead logfile
-        AlertSub="Hytec Labs: $LINE is down (its been a day now)"
-        printf 
-        "$Greet\n
-        $LINE Remains down at this time.\n
-        Its been down for twenty four hours now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with your findings.\n
-        Consider chasing this for an update from the client if we have not heard anything on this matter.\n\n
-        Regards\n\n\n
-        Bay-Leaf\n
-        (in beta)\n\n\n
-        Software Version: $SetVersion\n\n\n" >> "$SiteReport1"
-        #mutt -s "$AlertSub" -- "test@test.com" < $SiteReport1
-        mutt -s "$AlertSub" -- "test@test.com" <"$SiteReport1"
-      elif [ $GetDEADfile -eq 145 ];then
-        echo "W,$ScanTIME,,Website down,145" >> "$LogFile1"							# Write to dead logfile
-        AlertSub="Hytec Labs: $LINE still down (for two days now)"
-        printf 
-        "$Greet\n
-        $LINE Reports as down at this time.\n
-        Please keep checking the $DEPLoy USM deployment IOCs, also update #mssaware with your findings.\n\n
-        Regards\n\n\n
-        Bay-Leaf\n
-        (in beta)\n\n\n
-        Software Version: $SetVersion\n\n\n" >> "$SiteReport1"
-        #mutt -s "$AlertSub" -- "test@test.com" < $SiteReport1
-        mutt -s "$AlertSub" -- "test@test.com" <"$SiteReport1"
-      elif [ $GetDEADfile -eq 217 ];then
-        echo "W,$ScanTIME,,Website down,217" >> "$LogFile1"							# Write to dead logfile
-        AlertSub="Hytec Labs: $LINE is still down (its three days now)"
-        printf 
-        "$Greet\n
-        $LINE Reports as down at this time.\n
-        Its been down a while now, keep checking the $DEPLoy USM deployment for IOCs, also update #mssaware with any observations.\n\n
-        NOTE: There will be no further HyBox Bay-Leaf messages on this matter, until the confirmation that the site is back up.\n
-        Regards\n\n\n
-        Bay-Leaf\n
-        (in beta)\n\n\n
-        Software Version: $SetVersion\n\n\n" >> "$SiteReport1"
-        #mutt -s "$AlertSub" -- "test@test.com" < $SiteReport1
-        mutt -s "$AlertSub" -- "test@test.com" <"$SiteReport1"
-      fi
+      case "${GetDEADfile}" in                             # Send Mail
+          (2)
+            write_logfile "${GetDEADfile}"						   	# Write to dead logfile
+            AlertSub="20 mins now"
+            #mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            ;;
+          (13)
+            write_logfile "${GetDEADfile}"						   	# Write to dead logfile
+            AlertSub="4 Hrs now"            
+            #mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            ;;
+          (37)
+            write_logfile "${GetDEADfile}"						   	# Write to dead logfile
+            AlertSub="12 Hrs now"
+            #mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            ;;
+          (73)
+            write_logfile "${GetDEADfile}"						   	# Write to dead logfile
+            AlertSub="1 day now"
+            #mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            ;;
+          (145)
+            write_logfile "${GetDEADfile}"						   	# Write to dead logfile
+            AlertSub="2 days now"
+            #mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            ;;
+          (217)
+            write_logfile "${GetDEADfile}"						   	# Write to dead logfile
+            AlertSub="3 days now"
+            #mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            mutt -s "Hytec Labs: ${line} is down (${AlertSub})" -- "test@test.com" < <(print_message)
+            ;;
+      esac
     else
       echo "1" > "$OUTputFileName"
-      echo "W,$ScanTIME,,Website down,1" >> "$LogFile1"							# Write to dead logfile
-
-
+      write_logfile "${GetDEADfile}"                      # Write to dead logfile
       curl -Is "$LINE" | head -n 1 >> "$LogFile1"								# Debug code.....
-
-
-      AlertSub="Hytec Labs: $LINE part of the $DEPLoy USM deployment is reporting as DOWN"
-      printf 
-      "$Greet\n
-      $LINE Reports as down at this time.\n
-      This alarm is an IOA (Indicator of Activity)/possibly an IOC, please do a quick check the $DEPLoy USM deployment as well as the above website, as soon as you can for signs of IOA/IOC, also update #mssaware / #msswatch with your findings.\n\n
-      To note: sometimes a web site can report off line, and be fine (ie just busy), please await the next check in 20 mins, for confirmation prior to any escalation of this issue.\n\n
-      Regards\n\n\n
-      Bay-Leaf\n
-      (in beta)\n\n\n
-      Software Version: $SetVersion\n\n\n" >> "$SiteReport1"
-      #mutt -s "$AlertSub" -- "test@test.com" < "$SiteReport1"
-      mutt -s "$AlertSub" -- "test@test.com" <"$SiteReport1"
+      AlertSub="$LINE part of the $DEPLoy USM deployment is reporting as DOWN"
+      #mutt -s "Hytec Labs: (${$AlertSub})" -- "test@test.com" < <(print_message)
+      mutt -s "Hytec Labs: (${$AlertSub})" -- "test@test.com" < <(print_message)
     fi
-    rm -f "$SiteReport1"
   fi
 
 
