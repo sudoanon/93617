@@ -36,7 +36,7 @@ get_greeting() {
 
 # print message heredoc
 print_message() {
-cat << EOF
+cat <<- EOF
 $(get_greeting)
 
 $message_body
